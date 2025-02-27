@@ -20,11 +20,11 @@ function WeatherDisplay({ weather }) {
               <div className="temp-minmax">
                 <div className="temp-item">
                   <i className="fas fa-temperature-high"></i>
-                  <span>{Math.round(weather.main.temp_max)}°</span>
+                  <span>{Math.round(weather.main.temp_max)}°C</span>
                 </div>
                 <div className="temp-item">
                   <i className="fas fa-temperature-low"></i>
-                  <span>{Math.round(weather.main.temp_min)}°</span>
+                  <span>{Math.round(weather.main.temp_min)}°C</span>
                 </div>
               </div>
             </div>

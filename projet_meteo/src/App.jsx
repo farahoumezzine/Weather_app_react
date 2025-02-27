@@ -7,49 +7,23 @@ import { weatherService } from './services/weatherService';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import AnimatedBackground from './components/AnimatedBackground';
 import WeatherMap from './components/WeatherMap';
-import FavoriteLocations from './components/FavoriteLocations';
-import UnitToggle from './components/UnitToggle';
 
 function App() {
   const [currentWeather, setCurrentWeather] = useState(null);
   const [forecast, setForecast] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [unit, setUnit] = useState(() => localStorage.getItem('weatherUnit') || 'metric');
   const [alerts, setAlerts] = useState([]);
   const [airQuality, setAirQuality] = useState(null);
   const [historicalData, setHistoricalData] = useState(null);
   const [mapCoordinates, setMapCoordinates] = useState(null);
 
-  // Load user preferences on mount
-  useEffect(() => {
-    const savedUnit = localStorage.getItem('weatherUnit');
-    if (savedUnit) {
-      setUnit(savedUnit);
-    }
-  }, []);
-
-  // Handle unit changes
-  const handleUnitChange = (newUnit) => {
-    setUnit(newUnit);
-    localStorage.setItem('weatherUnit', newUnit);
-    // Refresh weather data with new unit
-    if (currentWeather) {
-      handleSearch(currentWeather.name);
-    }
-  };
-
-  // Handle favorite location selection
-  const handleFavoriteSelect = (city) => {
-    handleSearch(city);
-  };
-
   const handleSearch = async (city) => {
     try {
       setLoading(true);
       setError(null);
-      const weatherData = await weatherService.getCurrentWeather(city);
-      const forecastData = await weatherService.getForecast(city);
+      const weatherData = await weatherService.getCurrentWeather(city, 'metric');
+      const forecastData = await weatherService.getForecast(city, 'metric');
       setCurrentWeather(weatherData);
       setForecast(forecastData);
     } catch (error) {
@@ -66,8 +40,8 @@ function App() {
       setLoading(true);
       setError(null);
       const { latitude, longitude } = position.coords;
-      const weatherData = await weatherService.getWeatherByLocation(latitude, longitude);
-      const forecastData = await weatherService.getForecast(weatherData.name);
+      const weatherData = await weatherService.getWeatherByLocation(latitude, longitude, 'metric');
+      const forecastData = await weatherService.getForecast(weatherData.name, 'metric');
       setCurrentWeather(weatherData);
       setForecast(forecastData);
     } catch (error) {
@@ -83,11 +57,13 @@ function App() {
       <div className="custom-container py-4">
         <h1 className="text-center mb-4">Météo en Temps Réel</h1>
         <div className="row justify-content-center g-4">
-          {/* Search bar section */}
+          {/* Search and controls section */}
           <div className="col-12">
             <div className="search-container">
-              <SearchBar onSearch={handleSearch} />
-              <LocationButton onLocation={handleLocationWeather} />
+              <div className="d-flex gap-3 flex-grow-1">
+                <SearchBar onSearch={handleSearch} />
+                <LocationButton onLocation={handleLocationWeather} />
+              </div>
             </div>
           </div>
 
@@ -99,7 +75,7 @@ function App() {
               {/* Weather info section */}
               <div className="col-md-6">
                 <div className="weather-content-container">
-                  <WeatherDisplay weather={currentWeather} />
+                  <WeatherDisplay weather={currentWeather} unit="metric" />
                   {forecast && <Forecast forecast={forecast} />}
                 </div>
               </div>
